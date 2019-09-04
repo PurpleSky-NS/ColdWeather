@@ -1,6 +1,8 @@
 package com.purplesky.coldweather.db;
 
-public class Province {
+import org.litepal.crud.LitePalSupport;
+
+public class Province extends LitePalSupport {
     private int id;
     private int code;
     private String name;

@@ -1,7 +1,10 @@
 package com.purplesky.coldweather.db;
 
-public class County {
+import org.litepal.crud.LitePalSupport;
+
+public class County extends LitePalSupport {
     private int id;
+    private int countyCode;
     private int weatherId;
     private int cityCode;
     private String name;
@@ -12,6 +15,14 @@ public class County {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getCountyCode() {
+        return countyCode;
+    }
+
+    public void setCountyCode(int code) {
+        this.countyCode = code;
     }
 
     public int getWeatherId() {
