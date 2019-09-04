@@ -1,0 +1,9 @@
+<litepal>
+    <dbname value="cold_weather"/>
+    <version value="1"/>
+    <list>
+        <mapping class="com.purplesky.coldweather.db.Province"/>
+        <mapping class="com.purplesky.coldweather.db.City"/>
+        <mapping class="com.purplesky.coldweather.db.County"/>
+    </list>
+</litepal>
