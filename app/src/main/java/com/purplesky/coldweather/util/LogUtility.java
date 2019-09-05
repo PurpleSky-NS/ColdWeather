@@ -15,7 +15,7 @@ public class LogUtility {
 
     public static void e(String tag, String s) {
         if (LEVEL >= LEVEL_ERROR)
-            Log.d(tag, s);
+            Log.e(tag, s);
     }
     public static void w(String tag, String s) {
         if (LEVEL >= LEVEL_WARN)

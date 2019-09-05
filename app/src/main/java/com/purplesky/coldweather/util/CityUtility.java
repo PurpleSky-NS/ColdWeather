@@ -13,9 +13,9 @@ import java.util.List;
 public class CityUtility {
 
     private static final String TAG = "CityUtility";
-    private static final String CITY_API_URL="http://guolin.tech/api/china";
+    private static final String CITY_API_URL="http://guolin.tech/api/china/";
 
-    public static List<Province> QueryProvices(){
+    public static List<Province> QueryProvinces(){
         List<Province> provinces=LitePal.findAll(Province.class);
         if(provinces.isEmpty())
         {
@@ -31,27 +31,27 @@ public class CityUtility {
                 {
                     Province province=new Province();
                     JSONObject object=array.getJSONObject(i);
-                    province.setCode(object.getInt("id"));
+                    province.setProvinceCode(object.getInt("id"));
                     province.setName(object.getString("name"));
                     province.save();
                     provinces.add(province);
                 }
             }catch (Exception e){
-                LogUtility.e(TAG,e.getMessage());
+                LogUtility.e(TAG,e.toString());
             }
         }
         return provinces;
     }
 
     public static List<City> QueryCities(Province province){
-        List<City> cities=LitePal.findAll(City.class);
+        List<City> cities=LitePal.where("provinceCode="+province.getProvinceCode()).find(City.class);
         if(cities.isEmpty())
         {
             try {
-                String json = HttpUtility.SendRequest(CITY_API_URL+"/"+province.getCode());
+                String json = HttpUtility.SendRequest(CITY_API_URL+"/"+province.getProvinceCode());
                 if(json==null||json.isEmpty())
                 {
-                    LogUtility.e(TAG,"获取城市信息错误 Province : id = "+province.getCode()+" name = "+province.getName());
+                    LogUtility.e(TAG,"获取城市信息错误 Province : id = "+province.getProvinceCode()+" name = "+province.getName());
                     return null;
                 }
                 JSONArray array=new JSONArray(json);
@@ -61,19 +61,19 @@ public class CityUtility {
                     JSONObject object=array.getJSONObject(i);
                     city.setCityCode(object.getInt("id"));
                     city.setName(object.getString("name"));
-                    city.setProvinceCode(province.getCode());
+                    city.setProvinceCode(province.getProvinceCode());
                     city.save();
                     cities.add(city);
                 }
             }catch (Exception e){
-                LogUtility.e(TAG,e.getMessage());
+                LogUtility.e(TAG,e.toString());
             }
         }
         return cities;
     }
 
     public static List<County> QueryCounties(City city){
-        List<County> counties=LitePal.findAll(County.class);
+        List<County> counties=LitePal.where("cityCode="+city.getCityCode()).find(County.class);
         if(counties.isEmpty())
         {
             try {
@@ -88,7 +88,7 @@ public class CityUtility {
                 {
                     County county=new County();
                     JSONObject object=array.getJSONObject(i);
-                    county.setWeatherId(object.getInt("weather_id"));
+                    county.setWeatherId(object.getString("weather_id"));
                     county.setCountyCode(object.getInt("id"));
                     county.setName(object.getString("name"));
                     county.setCityCode(city.getCityCode());
@@ -96,11 +96,10 @@ public class CityUtility {
                     counties.add(county);
                 }
             }catch (Exception e){
-                LogUtility.e(TAG,e.getMessage());
+                LogUtility.e(TAG,e.toString());
             }
         }
         return counties;
     }
-
 
 }
