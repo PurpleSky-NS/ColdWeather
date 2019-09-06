@@ -1,10 +1,13 @@
 package com.purplesky.coldweather.View;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +33,7 @@ public class ChooseAreaFragment extends Fragment {
     private TextView title;
     private Button back;
     private RecyclerView cityList;
+    private ProgressDialog dialog;
     private int level;
 
     private Province chooseProvince;
@@ -45,6 +49,10 @@ public class ChooseAreaFragment extends Fragment {
         cityList=view.findViewById(R.id.choose_area_list);
         cityList.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
         cityList.setLayoutManager(new LinearLayoutManager(getContext()));
+        dialog=new ProgressDialog(getContext());
+        dialog.setCancelable(false);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setMessage("加载中...");
         return view;
     }
 
@@ -62,17 +70,20 @@ public class ChooseAreaFragment extends Fragment {
             }
         });
         RefreshProvinces();
+        dialog.show();
     }
 
     private void RefreshProvinces(){
         level=LEVEL_PROVINCE;
         back.setVisibility(View.GONE);
         title.setText("中国");
+        dialog.show();
         new Thread(()->{
             CityAdapter adapter=new CityAdapter(CityUtility.QueryProvinces(),CityAdapter.TYPE_PROVINCE,(province -> {
                 chooseProvince =(Province)province;
                 RefreshCities(chooseProvince);
             }));
+            dialog.dismiss();
             if(level==LEVEL_PROVINCE)
                 getActivity().runOnUiThread(()-> cityList.setAdapter(adapter));
         }).start();
@@ -82,12 +93,13 @@ public class ChooseAreaFragment extends Fragment {
         level=LEVEL_CITY;
         back.setVisibility(View.VISIBLE);
         title.setText(province.getName());
-
+        dialog.show();
         new Thread(()->{
             CityAdapter adapter=new CityAdapter(CityUtility.QueryCities(province),CityAdapter.TYPE_CITY,(city -> {
                 chooseCity =(City)city;
                 RefreshCounties(chooseCity);
             }));
+            dialog.dismiss();
             if(level==LEVEL_CITY)
                 getActivity().runOnUiThread(()-> cityList.setAdapter(adapter));
         }).start();
@@ -97,13 +109,17 @@ public class ChooseAreaFragment extends Fragment {
         level=LEVEL_COUNTY;
         back.setVisibility(View.VISIBLE);
         title.setText(city.getName());
+        dialog.show();
         new Thread(()->{
             CityAdapter adapter=new CityAdapter(CityUtility.QueryCounties(city),CityAdapter.TYPE_COUNTY,(county -> {
                 chooseCounty=(County)county;
                 Toast.makeText(getContext(),"你点击了"+((County)county).getName(),Toast.LENGTH_SHORT).show();
             }));
+            dialog.dismiss();
             if(level==LEVEL_COUNTY)
                 getActivity().runOnUiThread(()-> cityList.setAdapter(adapter));
         }).start();
     }
+
+
 }
