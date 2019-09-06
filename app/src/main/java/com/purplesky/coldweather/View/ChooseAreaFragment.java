@@ -2,6 +2,7 @@ package com.purplesky.coldweather.View;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.purplesky.coldweather.R;
+import com.purplesky.coldweather.WeatherActivity;
 import com.purplesky.coldweather.db.City;
 import com.purplesky.coldweather.db.County;
 import com.purplesky.coldweather.db.Province;
@@ -113,13 +115,15 @@ public class ChooseAreaFragment extends Fragment {
         new Thread(()->{
             CityAdapter adapter=new CityAdapter(CityUtility.QueryCounties(city),CityAdapter.TYPE_COUNTY,(county -> {
                 chooseCounty=(County)county;
-                Toast.makeText(getContext(),"你点击了"+((County)county).getName(),Toast.LENGTH_SHORT).show();
+                Intent intent=new Intent(getContext(), WeatherActivity.class);
+                intent.putExtra("weatherId",((County) county).getWeatherId());
+                startActivity(intent);
+                getActivity().finish();
             }));
             dialog.dismiss();
             if(level==LEVEL_COUNTY)
                 getActivity().runOnUiThread(()-> cityList.setAdapter(adapter));
         }).start();
     }
-
 
 }
