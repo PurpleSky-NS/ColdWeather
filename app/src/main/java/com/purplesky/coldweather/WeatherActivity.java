@@ -1,6 +1,8 @@
 package com.purplesky.coldweather;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.graphics.Color;
@@ -9,6 +11,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -20,10 +23,9 @@ import com.purplesky.coldweather.gson.Weather;
 import com.purplesky.coldweather.util.BufferDataUtility;
 import com.purplesky.coldweather.util.WeatherUtility;
 
-import java.nio.BufferOverflowException;
-
 public class WeatherActivity extends AppCompatActivity {
 
+    private Button titleNav;
     private TextView titleCity;
     private TextView titleTime;
 
@@ -39,6 +41,7 @@ public class WeatherActivity extends AppCompatActivity {
     private TextView suggestionCarwash;
     private TextView suggestionSport;
 
+    public DrawerLayout weatherDrawerLayout;
     private SwipeRefreshLayout weatherSwipeRefresh;
     private ImageView weatherImage;
 
@@ -48,30 +51,34 @@ public class WeatherActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
-        titleCity=findViewById(R.id.title_city);
-        titleTime=findViewById(R.id.title_time);
-        nowTemp =findViewById(R.id.now_temp);
-        nowInfo=findViewById(R.id.now_info);
-        forecastListLayout=findViewById(R.id.forecast_list_layout);
-        aqiAqi=findViewById(R.id.aqi_aqi);
-        aqiPm25=findViewById(R.id.aqi_pm25);
-        suggestionComfort=findViewById(R.id.suggestion_comfort);
-        suggestionCarwash=findViewById(R.id.suggestion_carwash);
-        suggestionSport=findViewById(R.id.suggestion_sport);
-        weatherSwipeRefresh=findViewById(R.id.weather_swiperefresh);
-        weatherImage=findViewById(R.id.weather_image);
-        weatherId=getIntent().getStringExtra("weatherId");
+        titleNav = findViewById(R.id.title_nav_btn);
+        titleCity = findViewById(R.id.title_city);
+        titleTime = findViewById(R.id.title_time);
+        nowTemp = findViewById(R.id.now_temp);
+        nowInfo = findViewById(R.id.now_info);
+        forecastListLayout = findViewById(R.id.forecast_list_layout);
+        aqiAqi = findViewById(R.id.aqi_aqi);
+        aqiPm25 = findViewById(R.id.aqi_pm25);
+        suggestionComfort = findViewById(R.id.suggestion_comfort);
+        suggestionCarwash = findViewById(R.id.suggestion_carwash);
+        suggestionSport = findViewById(R.id.suggestion_sport);
+        weatherDrawerLayout = findViewById(R.id.weather_drawerlayout);
+        weatherSwipeRefresh = findViewById(R.id.weather_swiperefresh);
+        weatherImage = findViewById(R.id.weather_image);
+        weatherId = getIntent().getStringExtra("weatherId");
 
         /*设置刷新控件*/
         weatherSwipeRefresh.setColorSchemeResources(R.color.colorPrimary);
-        weatherSwipeRefresh.setOnRefreshListener(()->RefreshWeather(weatherId));
+        weatherSwipeRefresh.setOnRefreshListener(() -> RefreshWeather(weatherId));
 
-        if(Build.VERSION.SDK_INT>=21){
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+        titleNav.setOnClickListener(v->weatherDrawerLayout.openDrawer(GravityCompat.START));
+
+        if (Build.VERSION.SDK_INT >= 21) {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
             getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
 
-        PreferenceManager.getDefaultSharedPreferences(this).edit().putString("weatherId",getIntent().getStringExtra("weatherId")).apply();
+        PreferenceManager.getDefaultSharedPreferences(this).edit().putString("weatherId", getIntent().getStringExtra("weatherId")).apply();
         LoadWeather(weatherId);
     }
 

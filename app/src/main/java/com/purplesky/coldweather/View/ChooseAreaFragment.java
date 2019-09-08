@@ -14,16 +14,19 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.purplesky.coldweather.MainActivity;
 import com.purplesky.coldweather.R;
 import com.purplesky.coldweather.WeatherActivity;
 import com.purplesky.coldweather.db.City;
 import com.purplesky.coldweather.db.County;
 import com.purplesky.coldweather.db.Province;
+import com.purplesky.coldweather.gson.Weather;
 import com.purplesky.coldweather.util.CityUtility;
 
 public class ChooseAreaFragment extends Fragment {
@@ -115,10 +118,17 @@ public class ChooseAreaFragment extends Fragment {
         new Thread(()->{
             CityAdapter adapter=new CityAdapter(CityUtility.QueryCounties(city),CityAdapter.TYPE_COUNTY,(county -> {
                 chooseCounty=(County)county;
-                Intent intent=new Intent(getContext(), WeatherActivity.class);
-                intent.putExtra("weatherId",((County) county).getWeatherId());
-                startActivity(intent);
-                getActivity().finish();
+                if(getActivity() instanceof MainActivity) {
+                    Intent intent = new Intent(getContext(), WeatherActivity.class);
+                    intent.putExtra("weatherId", ((County) county).getWeatherId());
+                    startActivity(intent);
+                    getActivity().finish();
+                }
+                else if(getActivity() instanceof WeatherActivity){
+                    WeatherActivity activity= (WeatherActivity) getActivity();
+                    activity.weatherDrawerLayout.closeDrawers();
+                    activity.RefreshWeather(((County) county).getWeatherId());
+                }
             }));
             dialog.dismiss();
             if(level==LEVEL_COUNTY)
