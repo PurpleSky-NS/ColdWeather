@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 
+/*我都不知道这算是个啥活动*/
 public class MainActivity extends AppCompatActivity {
 
     @Override

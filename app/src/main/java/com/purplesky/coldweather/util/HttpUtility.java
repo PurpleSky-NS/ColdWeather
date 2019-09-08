@@ -12,6 +12,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+/*同步/异步请求网络数据*/
 public class HttpUtility {
 
     private static final String TAG = "HttpUtility";

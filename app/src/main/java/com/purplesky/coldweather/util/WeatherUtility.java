@@ -16,6 +16,7 @@ import org.json.JSONObject;
 import java.nio.Buffer;
 import java.text.MessageFormat;
 
+/*获取天气信息的工具类，从本地/网络查找*/
 public class WeatherUtility {
 
     public interface OnGetWeather{

@@ -10,6 +10,7 @@ import org.litepal.LitePal;
 
 import java.util.List;
 
+/*查询城市信息的工具类，从数据库/网络上查，本地没有就从网上查*/
 public class CityUtility {
 
     private static final String TAG = "CityUtility";

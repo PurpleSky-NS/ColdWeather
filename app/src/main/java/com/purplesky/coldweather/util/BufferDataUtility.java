@@ -7,6 +7,7 @@ import android.nfc.Tag;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+/*读取数据工具类，从本地/网络获取数据，如果本地没有就从网络获取并且存入本地*/
 public class BufferDataUtility {
 
     private static final String TAG = "BufferDataUtility";

@@ -1,6 +1,7 @@
 package com.purplesky.coldweather;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.graphics.Color;
 import android.os.Build;
@@ -38,6 +39,7 @@ public class WeatherActivity extends AppCompatActivity {
     private TextView suggestionCarwash;
     private TextView suggestionSport;
 
+    private SwipeRefreshLayout weatherSwipeRefresh;
     private ImageView weatherImage;
 
     private String weatherId;
@@ -56,8 +58,13 @@ public class WeatherActivity extends AppCompatActivity {
         suggestionComfort=findViewById(R.id.suggestion_comfort);
         suggestionCarwash=findViewById(R.id.suggestion_carwash);
         suggestionSport=findViewById(R.id.suggestion_sport);
+        weatherSwipeRefresh=findViewById(R.id.weather_swiperefresh);
         weatherImage=findViewById(R.id.weather_image);
         weatherId=getIntent().getStringExtra("weatherId");
+
+        /*设置刷新控件*/
+        weatherSwipeRefresh.setColorSchemeResources(R.color.colorPrimary);
+        weatherSwipeRefresh.setOnRefreshListener(()->RefreshWeather(weatherId));
 
         if(Build.VERSION.SDK_INT>=21){
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
@@ -68,7 +75,9 @@ public class WeatherActivity extends AppCompatActivity {
         LoadWeather(weatherId);
     }
 
+    /*可以被外部调用，从网络上刷新天气/图片数据*/
     public void RefreshWeather(String weatherId){
+        weatherSwipeRefresh.setRefreshing(true);
         WeatherUtility.RequestWeather(this,weatherId,weather -> ShowWeather(weather));
         BufferDataUtility.RequestData(this,"weatherImage","http://guolin.tech/api/bing_pic",true,(data,t) -> {
             ShowImage(data);
@@ -76,7 +85,9 @@ public class WeatherActivity extends AppCompatActivity {
         });
     }
 
+    /*从本地/网络刷新*/
     private void LoadWeather(String weatherId){
+        weatherSwipeRefresh.setRefreshing(true);
         WeatherUtility.GetWeather(this,weatherId,weather -> ShowWeather(weather));
         BufferDataUtility.GetData(this,"weatherImage","http://guolin.tech/api/bing_pic",true,(data,fromNetwork) -> {
             ShowImage(data);
@@ -93,6 +104,7 @@ public class WeatherActivity extends AppCompatActivity {
             titleTime.setText(weather.basic.update.updateName.split(" ")[1]);
             nowTemp.setText(weather.now.temperature);
             nowInfo.setText(weather.now.more.info);
+            forecastListLayout.removeAllViews();
             for (Forecast forecast : weather.forecastList)
                 AddForecastItem(forecast);
             aqiAqi.setText(weather.aqi.city.aqi);
@@ -104,6 +116,8 @@ public class WeatherActivity extends AppCompatActivity {
         else{
             Toast.makeText(this,"获取天气失败",Toast.LENGTH_LONG).show();
         }
+        if(weatherSwipeRefresh.isRefreshing())
+            weatherSwipeRefresh.setRefreshing(false);
     }
 
     private void ShowImage(String imageData){

@@ -2,6 +2,7 @@ package com.purplesky.coldweather.util;
 
 import android.util.Log;
 
+/*日志工具类，异常信息也会用这个打印*/
 public class LogUtility {
 
     public static final int LEVEL_ERROR=5;
