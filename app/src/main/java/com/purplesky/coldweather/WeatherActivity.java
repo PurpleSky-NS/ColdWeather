@@ -3,8 +3,13 @@ package com.purplesky.coldweather;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -46,6 +51,13 @@ public class WeatherActivity extends AppCompatActivity {
     private ImageView weatherImage;
 
     private String weatherId;
+    private LocalBroadcastManager localBroadcastManager;
+    private BroadcastReceiver updateReceiver=new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            RefreshWeather(weatherId);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,8 +90,21 @@ public class WeatherActivity extends AppCompatActivity {
             getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
 
+        localBroadcastManager = LocalBroadcastManager.getInstance(this);
+        IntentFilter filter=new IntentFilter("UPDATE_WEATHER");
+        localBroadcastManager.registerReceiver(updateReceiver,filter);
+
+        Intent intent=new Intent(this,UpdateService.class);
+        startService(intent);
+
         PreferenceManager.getDefaultSharedPreferences(this).edit().putString("weatherId", getIntent().getStringExtra("weatherId")).apply();
         LoadWeather(weatherId);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        localBroadcastManager.unregisterReceiver(updateReceiver);
     }
 
     /*可以被外部调用，从网络上刷新天气/图片数据*/

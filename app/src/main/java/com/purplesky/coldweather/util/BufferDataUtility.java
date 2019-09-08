@@ -3,9 +3,7 @@ package com.purplesky.coldweather.util;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.nfc.Tag;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 /*读取数据工具类，从本地/网络获取数据，如果本地没有就从网络获取并且存入本地*/
 public class BufferDataUtility {
@@ -18,7 +16,7 @@ public class BufferDataUtility {
     }
 
     /*从requestUrl或者SharedPre获取数据
-    如果要inUiThread则Context必须是Activity
+    如果要inUiThread则Context必须是Activity，否则不用runOnUiThread
     如果是从网络获取的数据并且onUiThread才会调用runOnUiThread*/
     public static void GetData(Context context, String name, String requestUrl,boolean onUiThread, OnGetDataListener onGetDataListener) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -36,7 +34,7 @@ public class BufferDataUtility {
     public static void RequestData(Context context, String name, String requestUrl,boolean onUiThread, OnGetDataListener onGetDataListener) {
         HttpUtility.SendRequest(requestUrl, (data) -> {
             SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-            if (onUiThread)
+            if (onUiThread&&context instanceof Activity)
                 ((Activity) context).runOnUiThread(() -> SaveData(editor, name, onGetDataListener.onGetData(data, true)));
             else
                 SaveData(editor, name, onGetDataListener.onGetData(data, true));
