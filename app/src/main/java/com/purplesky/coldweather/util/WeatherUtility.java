@@ -26,41 +26,46 @@ public class WeatherUtility {
     private static final String TAG = "WeatherUtility";
     private static final String WEATHER_API_URL="http://guolin.tech/api/weather?cityid={0}&key=123456";
 
-    public static void GetWeather(Context context,String weatherId,OnGetWeather onGetWeather){
-        BufferDataUtility.GetData(context,"weather",MessageFormat.format(WEATHER_API_URL, weatherId),true,(json,fromNetWork)->{
-            String weatherJson=null;
-            Weather weather=null;
+    public static void GetWeather(final Context context,final String weatherId,final OnGetWeather onGetWeather){
+        BufferDataUtility.GetData(context,"weather",MessageFormat.format(WEATHER_API_URL, weatherId),true,new BufferDataUtility.OnGetDataListener(){
+			public String onGetData(String json,boolean fromNetWork){
+				String weatherJson=null;
+				Weather weather=null;
+				if(fromNetWork){
+					weatherJson=ParseWeatherJson(json);
+					weather=ParseWeather(weatherJson);
+				}
+				else
+					weather=ParseWeather(json);
 
-            if(fromNetWork){
-                weatherJson=ParseWeatherJson(json);
-                weather=ParseWeather(weatherJson);
-            }
-            else
-                weather=ParseWeather(json);
+				if(weather!=null&&weather.status!=null&&weather.status.equals("ok"))
+					onGetWeather.onGetWeather(weather);
+           
+				else
+					RequestWeather(context,weatherId,onGetWeather);
 
-            if(weather!=null&&weather.status!=null&&weather.status.equals("ok"))
-                onGetWeather.onGetWeather(weather);
-            else
-                RequestWeather(context,weatherId,onGetWeather);
-
-            if(fromNetWork)
-                return weatherJson;
-            else
-                return null;
+				if(fromNetWork)
+					return weatherJson;
+				else
+					return null;
+			}
         });
     }
 
-    public static void RequestWeather(Context context,String weatherId,OnGetWeather onGetWeather) {
+    public static void RequestWeather(Context context,String weatherId,final OnGetWeather onGetWeather) {
         String url = MessageFormat.format(WEATHER_API_URL, weatherId);
-        BufferDataUtility.RequestData(context, "weather", url, true, (json,fromNetWork) -> {
-            String weatherJson = ParseWeatherJson(json);
-            Weather weather = ParseWeather(weatherJson);
-            onGetWeather.onGetWeather(weather);
-            if (weather != null && weather.status != null && weather.status.equals("ok")) {
-                onGetWeather.onGetWeather(weather);
-                return weatherJson;
-            } else
-                return null;
+        BufferDataUtility.RequestData(context, "weather", url, true,new BufferDataUtility.OnGetDataListener(){
+			public String onGetData(String json,boolean fromNetWork){
+				String weatherJson = ParseWeatherJson(json);
+				Weather weather = ParseWeather(weatherJson);
+				onGetWeather.onGetWeather(weather);
+				if (weather != null && weather.status != null && weather.status.equals("ok")){
+					onGetWeather.onGetWeather(weather);
+					return weatherJson;
+				} 
+				else
+					return null;
+			}
         });
     }
 

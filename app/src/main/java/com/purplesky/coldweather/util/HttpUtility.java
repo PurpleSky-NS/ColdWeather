@@ -21,7 +21,7 @@ public class HttpUtility {
         void onResponse(String response);
     }
 
-    public static void SendRequest(String address, OnResponseListener onResponseListener){
+    public static void SendRequest(String address, final OnResponseListener onResponseListener){
         OkHttpClient client=new OkHttpClient();
         Request request=new Request.Builder().url(address).build();
         client.newCall(request).enqueue(new Callback() {

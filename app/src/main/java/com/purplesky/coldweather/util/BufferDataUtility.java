@@ -31,15 +31,21 @@ public class BufferDataUtility {
     }
 
     /*从requestUrl获取，非null则存入SharedPre*/
-    public static void RequestData(Context context, String name, String requestUrl,boolean onUiThread, OnGetDataListener onGetDataListener) {
-        HttpUtility.SendRequest(requestUrl, (data) -> {
-            SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-            if (onUiThread&&context instanceof Activity)
-                ((Activity) context).runOnUiThread(() -> SaveData(editor, name, onGetDataListener.onGetData(data, true)));
-            else
-                SaveData(editor, name, onGetDataListener.onGetData(data, true));
-            LogUtility.d(TAG, "Get Network data : " + name + "(" + data + ")");
-        });
+    public static void RequestData(final Context context, final String name, final String requestUrl,final boolean onUiThread,final OnGetDataListener onGetDataListener) {
+        HttpUtility.SendRequest(requestUrl, new HttpUtility.OnResponseListener(){
+			public void onResponse(final String data){
+				final SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+				if (onUiThread&&context instanceof Activity)
+					((Activity) context).runOnUiThread(new Runnable(){
+						public void run(){
+							SaveData(editor, name, onGetDataListener.onGetData(data, true));
+						}
+					});
+				else
+					SaveData(editor, name, onGetDataListener.onGetData(data, true));
+				LogUtility.d(TAG, "Get Network data : " + name + "(" + data + ")");
+			}
+		});
     }
 
     private static void SaveData(SharedPreferences.Editor editor,String name,String saveData) {

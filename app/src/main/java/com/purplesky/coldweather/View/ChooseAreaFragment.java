@@ -28,6 +28,7 @@ import com.purplesky.coldweather.db.County;
 import com.purplesky.coldweather.db.Province;
 import com.purplesky.coldweather.gson.Weather;
 import com.purplesky.coldweather.util.CityUtility;
+import android.view.View.*;
 
 public class ChooseAreaFragment extends Fragment {
 
@@ -64,14 +65,16 @@ public class ChooseAreaFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        back.setOnClickListener(v->{
-            switch (level){
-                case LEVEL_CITY:
-                    RefreshProvinces();
-                    break;
-                case LEVEL_COUNTY:
-                    RefreshCities(chooseProvince);
-                    break;
+        back.setOnClickListener(new OnClickListener(){
+			public void onClick(View v){
+				switch (level){
+					case LEVEL_CITY:
+						RefreshProvinces();
+						break;
+					case LEVEL_COUNTY:
+						RefreshCities(chooseProvince);
+						break;
+				}
             }
         });
         RefreshProvinces();
@@ -83,56 +86,80 @@ public class ChooseAreaFragment extends Fragment {
         back.setVisibility(View.GONE);
         title.setText("中国");
         dialog.show();
-        new Thread(()->{
-            CityAdapter adapter=new CityAdapter(CityUtility.QueryProvinces(),CityAdapter.TYPE_PROVINCE,(province -> {
-                chooseProvince =(Province)province;
-                RefreshCities(chooseProvince);
-            }));
-            dialog.dismiss();
-            if(level==LEVEL_PROVINCE)
-                getActivity().runOnUiThread(()-> cityList.setAdapter(adapter));
+        new Thread(new Runnable(){
+			public void run(){
+				final CityAdapter adapter=new CityAdapter(CityUtility.QueryProvinces(),CityAdapter.TYPE_PROVINCE,(new CityAdapter.OnCityChoose(){
+					public void onChoose(Object province){
+						chooseProvince =(Province)province;
+						RefreshCities(chooseProvince);
+					}
+				}));
+				dialog.dismiss();
+				if(level==LEVEL_PROVINCE)
+					getActivity().runOnUiThread(new Runnable(){
+						public void run(){
+							cityList.setAdapter(adapter);
+						}
+					});
+			}
         }).start();
     }
 
-    private void RefreshCities(Province province){
+    private void RefreshCities(final Province province){
         level=LEVEL_CITY;
         back.setVisibility(View.VISIBLE);
         title.setText(province.getName());
         dialog.show();
-        new Thread(()->{
-            CityAdapter adapter=new CityAdapter(CityUtility.QueryCities(province),CityAdapter.TYPE_CITY,(city -> {
-                chooseCity =(City)city;
-                RefreshCounties(chooseCity);
-            }));
-            dialog.dismiss();
-            if(level==LEVEL_CITY)
-                getActivity().runOnUiThread(()-> cityList.setAdapter(adapter));
+        new Thread(new Runnable(){
+			public void run(){
+				final CityAdapter adapter=new CityAdapter(CityUtility.QueryCities(province),CityAdapter.TYPE_CITY,(new CityAdapter.OnCityChoose(){
+					public void onChoose(Object city){
+						chooseCity =(City)city;
+                        RefreshCounties(chooseCity);
+                    }
+				}));
+				dialog.dismiss();
+				if(level==LEVEL_CITY)
+					getActivity().runOnUiThread(new Runnable(){
+						public void run(){
+							cityList.setAdapter(adapter);
+						}
+					});
+			}
         }).start();
     }
 
-    private void RefreshCounties(City city){
+    private void RefreshCounties(final City city){
         level=LEVEL_COUNTY;
         back.setVisibility(View.VISIBLE);
         title.setText(city.getName());
         dialog.show();
-        new Thread(()->{
-            CityAdapter adapter=new CityAdapter(CityUtility.QueryCounties(city),CityAdapter.TYPE_COUNTY,(county -> {
-                chooseCounty=(County)county;
-                if(getActivity() instanceof MainActivity) {
-                    Intent intent = new Intent(getContext(), WeatherActivity.class);
-                    intent.putExtra("weatherId", ((County) county).getWeatherId());
-                    startActivity(intent);
-                    getActivity().finish();
-                }
-                else if(getActivity() instanceof WeatherActivity){
-                    WeatherActivity activity= (WeatherActivity) getActivity();
-                    activity.weatherDrawerLayout.closeDrawers();
-                    activity.RefreshWeather(((County) county).getWeatherId());
-                }
-            }));
-            dialog.dismiss();
-            if(level==LEVEL_COUNTY)
-                getActivity().runOnUiThread(()-> cityList.setAdapter(adapter));
+        new Thread(new Runnable(){
+			public void run(){
+				final CityAdapter adapter=new CityAdapter(CityUtility.QueryCounties(city),CityAdapter.TYPE_COUNTY,(new CityAdapter.OnCityChoose(){
+					public void onChoose(Object county){
+						chooseCounty=(County)county;
+						if(getActivity() instanceof MainActivity) {
+							Intent intent = new Intent(getContext(), WeatherActivity.class);
+							intent.putExtra("weatherId", ((County) county).getWeatherId());
+							startActivity(intent);
+							getActivity().finish();
+						}
+						else if(getActivity() instanceof WeatherActivity){
+							WeatherActivity activity= (WeatherActivity) getActivity();
+							activity.weatherDrawerLayout.closeDrawers();
+							activity.RefreshWeather(((County) county).getWeatherId());
+						}
+					}
+				}));
+				dialog.dismiss();
+				if(level==LEVEL_COUNTY)
+					getActivity().runOnUiThread(new Runnable(){
+						public void run(){
+							cityList.setAdapter(adapter);
+						}
+					});
+			}
         }).start();
     }
 

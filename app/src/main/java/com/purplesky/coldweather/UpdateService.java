@@ -43,9 +43,13 @@ public class UpdateService extends Service {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         String weatherId=preferences.getString("weatherId",null);
         if(weatherId!=null)
-            WeatherUtility.RequestWeather(this,weatherId,(weather)->{});
+            WeatherUtility.RequestWeather(this,weatherId,new WeatherUtility.OnGetWeather(){
+				public void onGetWeather(Weather w){}
+			});
 
-        BufferDataUtility.RequestData(this,"weatherImage","http://guolin.tech/api/bing_pic",false,(data, t) ->  data);
+        BufferDataUtility.RequestData(this,"weatherImage","http://guolin.tech/api/bing_pic",false,new BufferDataUtility.OnGetDataListener(){
+			public String onGetData(String data, boolean t){return data;}
+		});
         localBroadcastManager.sendBroadcast(broadcastIntent);
 
         AlarmManager manager = (AlarmManager) getSystemService(ALARM_SERVICE);

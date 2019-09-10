@@ -27,6 +27,8 @@ import com.purplesky.coldweather.gson.Forecast;
 import com.purplesky.coldweather.gson.Weather;
 import com.purplesky.coldweather.util.BufferDataUtility;
 import com.purplesky.coldweather.util.WeatherUtility;
+import android.view.View.*;
+import com.purplesky.coldweather.util.*;
 
 public class WeatherActivity extends AppCompatActivity {
 
@@ -81,9 +83,17 @@ public class WeatherActivity extends AppCompatActivity {
 
         /*设置刷新控件*/
         weatherSwipeRefresh.setColorSchemeResources(R.color.colorPrimary);
-        weatherSwipeRefresh.setOnRefreshListener(() -> RefreshWeather(weatherId));
+        weatherSwipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener(){
+			public void onRefresh(){
+				RefreshWeather(weatherId);
+			}
+		});
 
-        titleNav.setOnClickListener(v->weatherDrawerLayout.openDrawer(GravityCompat.START));
+        titleNav.setOnClickListener(new OnClickListener(){
+			public void onClick(View v){
+				weatherDrawerLayout.openDrawer(GravityCompat.START);
+			}
+		});
 
         if (Build.VERSION.SDK_INT >= 21) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
@@ -110,24 +120,36 @@ public class WeatherActivity extends AppCompatActivity {
     /*可以被外部调用，从网络上刷新天气/图片数据*/
     public void RefreshWeather(String weatherId){
         weatherSwipeRefresh.setRefreshing(true);
-        WeatherUtility.RequestWeather(this,weatherId,weather -> ShowWeather(weather));
-        BufferDataUtility.RequestData(this,"weatherImage","http://guolin.tech/api/bing_pic",true,(data,t) -> {
-            ShowImage(data);
-            return data;
-        });
+        WeatherUtility.RequestWeather(this,weatherId,new WeatherUtility.OnGetWeather(){
+			public void onGetWeather(Weather weather){
+				ShowWeather(weather);
+			}
+		});
+        BufferDataUtility.RequestData(this,"weatherImage","http://guolin.tech/api/bing_pic",true,new BufferDataUtility.OnGetDataListener(){
+			public String onGetData(String data,boolean fromNetwork){
+				ShowImage(data);
+				return data;
+			}
+		});
     }
 
     /*从本地/网络刷新*/
     private void LoadWeather(String weatherId){
         weatherSwipeRefresh.setRefreshing(true);
-        WeatherUtility.GetWeather(this,weatherId,weather -> ShowWeather(weather));
-        BufferDataUtility.GetData(this,"weatherImage","http://guolin.tech/api/bing_pic",true,(data,fromNetwork) -> {
-            ShowImage(data);
-            if(fromNetwork)
-                return data;
-            else
-                return null;
-        });
+        WeatherUtility.GetWeather(this,weatherId,new WeatherUtility.OnGetWeather(){
+			public void onGetWeather(Weather weather){
+				ShowWeather(weather);
+			}
+		});
+        BufferDataUtility.GetData(this,"weatherImage","http://guolin.tech/api/bing_pic",true,new BufferDataUtility.OnGetDataListener(){
+			public String onGetData(String data,boolean fromNetwork){
+				ShowImage(data);
+				if(fromNetwork)
+					return data;
+				else
+					return null;
+			}
+		});
     }
 
     private void ShowWeather(Weather weather){

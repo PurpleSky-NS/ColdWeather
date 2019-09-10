@@ -14,6 +14,7 @@ import com.purplesky.coldweather.db.County;
 import com.purplesky.coldweather.db.Province;
 
 import java.util.List;
+import android.view.View.*;
 
 public class CityAdapter extends RecyclerView.Adapter<CityAdapter.ViewHolder> {
 
@@ -52,7 +53,7 @@ public class CityAdapter extends RecyclerView.Adapter<CityAdapter.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder,final int position) {
         String text=null;
         switch (type){
             case TYPE_PROVINCE:
@@ -65,7 +66,11 @@ public class CityAdapter extends RecyclerView.Adapter<CityAdapter.ViewHolder> {
                 text=((List<County>)(list)).get(position).getName();
                 break;
         }
-        holder.view.setOnClickListener(v->onCityChoose.onChoose(list.get(position)));
+        holder.view.setOnClickListener(new OnClickListener(){
+			public void onClick(View v){
+				onCityChoose.onChoose(list.get(position));
+			}
+		});
         holder.textView.setText(text);
     }
 
