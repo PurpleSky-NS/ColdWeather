@@ -23,8 +23,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.purplesky.coldweather.View.ChooseAreaFragment;
 import com.purplesky.coldweather.gson.Forecast;
 import com.purplesky.coldweather.gson.Weather;
+import com.purplesky.coldweather.service.UpdateService;
 import com.purplesky.coldweather.util.BufferDataUtility;
 import com.purplesky.coldweather.util.WeatherUtility;
 
@@ -94,7 +96,7 @@ public class WeatherActivity extends AppCompatActivity {
         IntentFilter filter=new IntentFilter("UPDATE_WEATHER");
         localBroadcastManager.registerReceiver(updateReceiver,filter);
 
-        Intent intent=new Intent(this,UpdateService.class);
+        Intent intent=new Intent(this, UpdateService.class);
         startService(intent);
 
         PreferenceManager.getDefaultSharedPreferences(this).edit().putString("weatherId", getIntent().getStringExtra("weatherId")).apply();

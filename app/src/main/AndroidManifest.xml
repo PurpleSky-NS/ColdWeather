@@ -13,7 +13,7 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <service
-            android:name=".UpdateService"
+            android:name=".service.UpdateService"
             android:enabled="true"
             android:exported="true"/>
 

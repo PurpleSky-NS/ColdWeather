@@ -1,12 +1,10 @@
-package com.purplesky.coldweather;
+package com.purplesky.coldweather.service;
 
-import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Binder;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
@@ -14,7 +12,6 @@ import android.preference.PreferenceManager;
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.purplesky.coldweather.gson.Weather;
 import com.purplesky.coldweather.util.BufferDataUtility;
 import com.purplesky.coldweather.util.LogUtility;
 import com.purplesky.coldweather.util.WeatherUtility;

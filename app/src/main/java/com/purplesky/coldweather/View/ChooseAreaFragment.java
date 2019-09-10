@@ -1,6 +1,5 @@
 package com.purplesky.coldweather.View;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,13 +7,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -26,7 +22,6 @@ import com.purplesky.coldweather.WeatherActivity;
 import com.purplesky.coldweather.db.City;
 import com.purplesky.coldweather.db.County;
 import com.purplesky.coldweather.db.Province;
-import com.purplesky.coldweather.gson.Weather;
 import com.purplesky.coldweather.util.CityUtility;
 
 public class ChooseAreaFragment extends Fragment {
@@ -58,6 +53,16 @@ public class ChooseAreaFragment extends Fragment {
         dialog.setCancelable(false);
         dialog.setCanceledOnTouchOutside(false);
         dialog.setMessage("加载中...");
+
+        //获取状态栏高度
+        if(getContext()instanceof WeatherActivity) {
+            int statusBarHeight = 0;
+            int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+            if (resourceId > 0)
+                statusBarHeight = getResources().getDimensionPixelSize(resourceId);
+            view.findViewById(R.id.choose_area_frameLayout).setPadding(0, statusBarHeight, 0, 0);
+        }
+
         return view;
     }
 
